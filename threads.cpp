@@ -1,63 +1,39 @@
 #include <iostream>
 #include <thread>
-#include <chrono>
 #include <vector>
+
+#include <chrono>
 #include <mutex>
 
-int resourceA = 1000000;
-std::mutex resourceAGuard;
 
-int resourceB = 1000000;
-std::mutex resourceBGuard;
+std::vector<int> queueFirst;
+std::vector<int> queueSecond;	
+std::vector<std::vector<int>> matrix;	
 
-void foo()
+std::mutex mx; 
+
+void producerThread()
 {
-	for (int i = 0; i < 100; i++)
-	{
-		resourceAGuard.lock();
-		resourceBGuard.lock();
-
-		resourceA -= 7;
-		resourceB += 7;
-
-		//std::cout << "foo" << std::endl;
-
-		resourceBGuard.unlock();
-		resourceAGuard.unlock();
-
-	}
+	std::cout << "Foo" << std::endl;
 }
 
-void bar()
+void parserThread()
 {
-	for (int i = 0; i < 100; i++)
-	{
-		resourceAGuard.lock();
-		resourceBGuard.lock();
-
-
-		resourceA -= 7;
-		resourceB += 7;
-
-		//std::cout << "bar" << std::endl;
-
-		resourceBGuard.unlock();
-		resourceAGuard.unlock();
-
-	}
+	std::cout << "Bar" << std::endl;
 }
 
 int main()
 {
-	auto fooThread = std::thread(foo);
-	auto barThread = std::thread(bar);
+	std::vector<std::thread> threads;
+	for (int i = 0; i < 1; i++)
+		threads.push_back(std::thread(producerThread));
 
-	fooThread.join();
-	barThread.join();
+	for (int i = 0; i < 1; i++)
+		threads.push_back(std::thread(parserThread));
 
-	std::cout << "main done" << std::endl;
-	std::cout << "resourceA:" << resourceA << std::endl;
-	std::cout << "resourceB:" << resourceB << std::endl;
+	for (auto& thread : threads)
+		thread.join();
 
+	std::cout << "Main Done" << std::endl;
 	return 0;
 }
