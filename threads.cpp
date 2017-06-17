@@ -8,9 +8,10 @@
 
 std::vector<int> queueFirst;
 std::vector<int> queueSecond;	
-std::vector<std::vector<int>> matrix;	
 
 std::mutex mx; 
+
+std::vector<std::vector<int>> matrix;	
 
 void producerThread(int M, int N)
 {
@@ -29,10 +30,10 @@ void producerThread(int M, int N)
 
 void parserThread()
 {
-	for (auto& number : queueFirst)
-		std::cout << "First:" << number << std::endl;
-	for (auto& number : queueSecond)
-		std::cout << "Second:" << number << std::endl;
+	std::cout << "First:" << queueFirst.back() << std::endl;
+	queueFirst.pop_back();
+	std::cout << "Second:" << queueSecond.back() << std::endl;
+	queueSecond.pop_back();
 }
 
 int main()
@@ -51,8 +52,6 @@ int main()
 	std::cout << "Main Done" << std::endl;
 	char symbol = 254;
 	int a = symbol;
-	std::cout << symbol << std::endl;
+	std::cout << "♞" << std::endl;
 	return 0;
 }
-
-�
