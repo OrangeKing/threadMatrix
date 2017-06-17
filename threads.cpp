@@ -29,7 +29,10 @@ void producerThread(int M, int N)
 
 void parserThread()
 {
-	std::cout << "Bar" << std::endl;
+	for (auto& number : queueFirst)
+		std::cout << "First:" << number << std::endl;
+	for (auto& number : queueSecond)
+		std::cout << "Second:" << number << std::endl;
 }
 
 int main()
@@ -46,11 +49,10 @@ int main()
 		thread.join();
 
 	std::cout << "Main Done" << std::endl;
-
-	for (auto& number : queueFirst)
-		std::cout << "First:" << number << std::endl;
-	for (auto& number : queueSecond)
-		std::cout << "Second:" << number << std::endl;
-
+	char symbol = 254;
+	int a = symbol;
+	std::cout << symbol << std::endl;
 	return 0;
 }
+
+�
