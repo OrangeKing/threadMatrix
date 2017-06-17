@@ -4,45 +4,60 @@
 #include <vector>
 #include <mutex>
 
-int glob = 1337;
+int resourceA = 1000000;
+std::mutex resourceAGuard;
 
-long long sum = 0;
-std::mutex mx;
+int resourceB = 1000000;
+std::mutex resourceBGuard;
 
 void foo()
 {
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < 100; i++)
 	{
-		mx.lock();
-		sum += 7;
-		mx.unlock();
+		resourceAGuard.lock();
+		resourceBGuard.lock();
+
+		resourceA -= 7;
+		resourceB += 7;
+
+		//std::cout << "foo" << std::endl;
+
+		resourceBGuard.unlock();
+		resourceAGuard.unlock();
+
 	}
 }
 
 void bar()
 {
-	std::this_thread::sleep_for(std::chrono::seconds(2));	//sleep(4);
-	std::cout << "bar done" << glob << std::endl;
+	for (int i = 0; i < 100; i++)
+	{
+		resourceAGuard.lock();
+		resourceBGuard.lock();
+
+
+		resourceA -= 7;
+		resourceB += 7;
+
+		//std::cout << "bar" << std::endl;
+
+		resourceBGuard.unlock();
+		resourceAGuard.unlock();
+
+	}
 }
 
 int main()
 {
-	std::vector<std::thread> threads;
+	auto fooThread = std::thread(foo);
+	auto barThread = std::thread(bar);
 
-	//10 watkow FOO
-	for (int i = 0; i < 10; i++)
-		threads.push_back(std::thread(foo));
-	
-	for (auto& thread : threads)
-		thread.join();
+	fooThread.join();
+	barThread.join();
 
-	//auto fooThread = std::thread(foo); //create new threads
-	//auto barThread = std::thread(bar); 
-	//fooThread.join();	//lock till the end of thread
-	//barThread.join();
-
-	std::cout << sum << std::endl;
 	std::cout << "main done" << std::endl;
+	std::cout << "resourceA:" << resourceA << std::endl;
+	std::cout << "resourceB:" << resourceB << std::endl;
 
 	return 0;
 }

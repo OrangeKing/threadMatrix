@@ -1,1 +1,0 @@
-g++ -std=c++11 -pthread threads.cpp -o playthreads
