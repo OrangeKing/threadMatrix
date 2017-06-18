@@ -1,8 +1,8 @@
 SHELL	=	/bin/sh
 
 INCLUDE	=	
-LIBS	=	"-pthread"
-CFLAGS	=	"-std=c++11"
+LIBS	=	-pthread -lncurses
+CFLAGS	=	-std=c++11
 
 play: threads.cpp
 	$(CXX) $(CFLAGS) $(LIBS) $? $(LDFLAGS) -o $@ 

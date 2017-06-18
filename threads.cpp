@@ -3,7 +3,10 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <ncurses.h>
 #include <mutex>
+
+#define PAWN_CHAR ACS_DIAMOND
 
 static int RR = 5;
 static int CC = 5;
