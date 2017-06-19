@@ -2,18 +2,9 @@
 
 #define PAWN ACS_DIAMOND
 
-void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers, int nParsers)
+void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers, 
+	int nParsers,int M, int N, std::vector<std::vector<char>>matrix)
 {
-///////////////////////////////////TEMP VEC DATA///////////////////////////////////
-	std::vector<int> cue;
-	for (int i = 0; i < 5; i++)
-		cue.push_back(5);
-
-	std::vector<int> hue;
-	for (int i = 0; i < 8; i++)
-		hue.push_back(4);
-
-//////////////////////////////////////////////////////////////////////
 
 	initscr();											//screen 'constructor'
 	cbreak();											//raw();
@@ -25,16 +16,16 @@ void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers,
 	init_pair(3,COLOR_GREEN, COLOR_BLACK);
 	init_pair(4,COLOR_WHITE, COLOR_BLACK);
 
-	queueStatus(first, second);								//paint info ui
+	queueStatus(first, second);							//paint info ui
 	threadStatus(nProducers, nParsers);
 
-    int lines = 5, cols = 5;							//number of rows, number of columns
+    int lines = M, cols = N;							//number of rows, number of columns
 	WINDOW * win = newwin(100,100,6,3);					//board section window
    	refresh();
 
-   	board(win,lines,cols);								//board painting
+   	board(win,lines,cols,matrix);						//board painting
+	
 	wrefresh(win);
-
 	getch();											//getchar
 	endwin();											//screen 'destructor' 
 }
@@ -101,7 +92,7 @@ void threadStatus(int nProducers, int nParsers)
 	attroff(A_BOLD | COLOR_PAIR(4));
 }
 
-void board(WINDOW *win, int lines, int cols)
+void board(WINDOW *win, int lines, int cols, std::vector<std::vector<char>>matrix)
 {
 	attron(A_UNDERLINE);
     	mvprintw(5,18,"Matrix contents:\n");
@@ -147,14 +138,15 @@ void board(WINDOW *win, int lines, int cols)
 		mvwaddch(win, end_y,	i, 		ACS_BTEE);
 	}
 
-	//temp : pawn printing
+	//pawn printing
 	for(j = start_x + tile_width/2; j <= end_x; j += 8)
 		for(i = start_y + tile_height/2; i <= end_y; i += 4)
 		{
-			mvwaddch(win,i, j, PAWN);
-			std::string s = "(" + std::to_string((i-2)/4) + "," + std::to_string((j-4)/8) + ")";
+			if(matrix[(i-2)/4][(j-4)/8]=='x')
+				mvwaddch(win,i, j, PAWN);
 
+			std::string s = "(" + std::to_string((i-2)/4) + "," + std::to_string((j-4)/8) + ")";
 			char const *pchar = s.c_str();
-			mvwprintw(win,i, j+1, pchar);
+			mvwprintw(win,i+2, j, pchar);
 		}
 }

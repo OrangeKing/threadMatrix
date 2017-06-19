@@ -1,9 +1,7 @@
-#include <iostream>
 #include <thread>
-#include <vector>
+#include <mutex>
 #include <random>
 #include <chrono>
-#include <mutex>
 
 #include "window.h"
 
@@ -16,17 +14,14 @@ std::vector<int> queueSecond;
 
 std::mutex mx; 
 
-
 void producerThread(int M, int N)
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 
-	std::uniform_int_distribution<int> horizontal(0,M-1);	//losowa kolumna
-	std::uniform_int_distribution<int> vertical(0,N-1);		// losowy wiersz
+	std::uniform_int_distribution<int> horizontal(0,M-1);	//random row
+	std::uniform_int_distribution<int> vertical(0,N-1);		//random column
 
-	// int first = horizontal(mt);
-	// int second = vertical(mt);
 	mx.lock();
 		queueFirst.push_back(horizontal(mt));
 		queueSecond.push_back(vertical(mt));
@@ -37,37 +32,30 @@ void parserThread()
 {
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
-	//testy
-	matrix[2][2] = 'x';
-
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<int> direction(0,3);	//losowy kierunek przesuniecia (0=N;1=S;2=W;3=E)
 
-	for (int i = 0; i < RR; i++)
-	{
-		for (int j = 0; j < CC; j++)
-		{
-			if(matrix[i][j]=='x')
-			{
-				std::cout << "ALARM-" << i+1 << j+1 << std::endl;
+	// for (int i = 0; i < RR; i++)
+	// {
+	// 	for (int j = 0; j < CC; j++)
+	// 	{
+	// 		if(matrix[i][j]=='x')
+	// 		{
+	// 			std::cout << "ALARM-" << i+1 << j+1 << std::endl;
 				
-				matrix[i][j] = 0;
+	// 			matrix[i][j] = 0;
 				
-				if (j-1>0)
-					matrix[i][j-1] = 'x';
-			}
-		}
-	}
+	// 			if (j-1>0)
+	// 				matrix[i][j-1] = 'x';
+	// 		}
+	// 	}
+	// }
 
 	mx.lock();
 	if ((queueFirst.size() > 0) and (queueFirst.size() > 0))
 	{
-		// std::cout << "First:" << queueFirst.back()+1 << std::endl;
-		// std::cout << "Second:" << queueSecond.back()+1 << std::endl;
-
 		matrix[queueFirst.back()][queueSecond.back()] = 'x';
-
 		queueFirst.pop_back();
 		queueSecond.pop_back();
 	}
@@ -76,23 +64,25 @@ void parserThread()
 
 int main()
 {
-	//Background thread running 
+	//Background threads running 
 	std::vector<std::thread> producerThreads;
 	std::vector<std::thread> parserThreads;
 	
-	for (int i = 0; i < 8; i++)
-		producerThreads.push_back(std::thread(producerThread,5,5));	//liczby z zakresu m, n 
+	//auto screenThread = std::thread(screen);
+
 	for (int i = 0; i < 3; i++)
+		producerThreads.push_back(std::thread(producerThread,5,5));	//liczby z zakresu m, n 
+	for (int i = 0; i < 1; i++)
 		parserThreads.push_back(std::thread(parserThread));
 
 	for (auto& thread : producerThreads)
 		thread.join();
 	for (auto& thread : parserThreads)
 		thread.join();
-	//Thread work end here
+
+	//screenThread.join();
 
 	std::cout << "Main Done" << std::endl;
-
-	drawScreen(queueFirst,queueSecond,producerThreads.size(),parserThreads.size());
+	drawScreen(queueFirst,queueSecond,producerThreads.size(),parserThreads.size(),RR,CC,matrix);
 	return 0;
 }
