@@ -36,6 +36,7 @@ void parserThread()
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<int> direction(0,3);	//losowy kierunek przesuniecia (0=N;1=S;2=W;3=E)
 
+	//shuffle board
 	// for (int i = 0; i < RR; i++)
 	// {
 	// 	for (int j = 0; j < CC; j++)
@@ -52,6 +53,7 @@ void parserThread()
 	// 	}
 	// }
 
+	//retrive pawn
 	mx.lock();
 	if ((queueFirst.size() > 0) and (queueFirst.size() > 0))
 	{
