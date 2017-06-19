@@ -4,8 +4,8 @@ INCLUDE	=
 LIBS	=	-pthread -lncurses
 CFLAGS	=	-std=c++11
 
-play: threads.cpp
-	$(CXX) $(CFLAGS) $(LIBS) $? $(LDFLAGS) -o $@ 
+play: threads.cpp window.cpp window.h
+	$(CXX) $(CFLAGS) $? $(LDFLAGS) -o $@ $(LIBS)
 
 clean:
 	rm *.out play

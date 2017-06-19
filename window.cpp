@@ -1,15 +1,8 @@
-#include <ncurses.h>
-#include <vector>
-#include <iostream>
-#include <string>
+#include "window.h"
 
 #define PAWN ACS_DIAMOND
 
-void queueStatus(std::vector<int> first, std::vector<int> second);
-void threadStatus(std::vector<int> producers, std::vector<int> parsers); //!! MAKE IT THREAD VEC
-void board(WINDOW *win, int lines, int cols);
-
-int main()
+void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers, int nParsers)
 {
 ///////////////////////////////////TEMP VEC DATA///////////////////////////////////
 	std::vector<int> cue;
@@ -32,8 +25,8 @@ int main()
 	init_pair(3,COLOR_GREEN, COLOR_BLACK);
 	init_pair(4,COLOR_WHITE, COLOR_BLACK);
 
-	queueStatus(cue, hue);								//paint info ui
-	threadStatus(cue, hue);
+	queueStatus(first, second);								//paint info ui
+	threadStatus(nProducers, nParsers);
 
     int lines = 5, cols = 5;							//number of rows, number of columns
 	WINDOW * win = newwin(100,100,6,3);					//board section window
@@ -44,8 +37,6 @@ int main()
 
 	getch();											//getchar
 	endwin();											//screen 'destructor' 
-
-	return 0;
 }
 
 void queueStatus(std::vector<int> first, std::vector<int> second)
@@ -87,7 +78,7 @@ void queueStatus(std::vector<int> first, std::vector<int> second)
 	attroff(A_BOLD);
 }
 
-void threadStatus(std::vector<int> producers, std::vector<int> parsers)
+void threadStatus(int nProducers, int nParsers)
 {
 	move(0,100);
 
@@ -96,9 +87,8 @@ void threadStatus(std::vector<int> producers, std::vector<int> parsers)
 	attroff(COLOR_PAIR(3));
 	
 	attron(A_BOLD | COLOR_PAIR(4));
-		printw("%d",producers.size());
+		printw("%d",nProducers);
 	attroff(A_BOLD | COLOR_PAIR(4));
-
 
 	move(1,100);
 
@@ -107,7 +97,7 @@ void threadStatus(std::vector<int> producers, std::vector<int> parsers)
 	attroff(COLOR_PAIR(3));
 
 	attron(A_BOLD | COLOR_PAIR(4));
-		printw("%d",parsers.size());
+		printw("%d",nParsers);
 	attroff(A_BOLD | COLOR_PAIR(4));
 }
 

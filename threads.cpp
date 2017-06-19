@@ -3,10 +3,9 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include <ncurses.h>
 #include <mutex>
 
-#define PAWN_CHAR ACS_DIAMOND
+#include "window.h"
 
 static int RR = 5;
 static int CC = 5;
@@ -28,14 +27,15 @@ void producerThread(int M, int N)
 
 	// int first = horizontal(mt);
 	// int second = vertical(mt);
-
-	queueFirst.push_back(horizontal(mt));
-	queueSecond.push_back(vertical(mt));
+	mx.lock();
+		queueFirst.push_back(horizontal(mt));
+		queueSecond.push_back(vertical(mt));
+	mx.unlock();
 }
 
 void parserThread()
 {
-	//std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	//testy
 	matrix[2][2] = 'x';
@@ -60,6 +60,7 @@ void parserThread()
 		}
 	}
 
+	mx.lock();
 	if ((queueFirst.size() > 0) and (queueFirst.size() > 0))
 	{
 		// std::cout << "First:" << queueFirst.back()+1 << std::endl;
@@ -70,40 +71,28 @@ void parserThread()
 		queueFirst.pop_back();
 		queueSecond.pop_back();
 	}
-}
-
-void nCursesThread()	//wyswietlacz
-{
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	for (int i = 0; i < RR; i++)
-	{
-		for (int j = 0; j < CC; j++)
-		{
-			std::cout << "Field " << i+1 << "/" << j+1 << ": " << matrix[i][j] << " ";
-		}
-		std::cout << std::endl;
-	}
+	mx.unlock();
 }
 
 int main()
 {
 	//Background thread running 
-	std::vector<std::thread> threads;
+	std::vector<std::thread> producerThreads;
+	std::vector<std::thread> parserThreads;
 	
-	for (int i = 0; i < 1; i++)
-		threads.push_back(std::thread(producerThread,5,5));	//liczby z zakresu m, n 
-	for (int i = 0; i < 1; i++)
-		threads.push_back(std::thread(parserThread));
+	for (int i = 0; i < 8; i++)
+		producerThreads.push_back(std::thread(producerThread,5,5));	//liczby z zakresu m, n 
+	for (int i = 0; i < 3; i++)
+		parserThreads.push_back(std::thread(parserThread));
 
-	for (auto& thread : threads)
+	for (auto& thread : producerThreads)
 		thread.join();
-	
+	for (auto& thread : parserThreads)
+		thread.join();
 	//Thread work end here
-	// std::cout << "♞" << std::endl;
 
 	std::cout << "Main Done" << std::endl;
-	nCursesThread();
 
+	drawScreen(queueFirst,queueSecond,producerThreads.size(),parserThreads.size());
 	return 0;
 }
