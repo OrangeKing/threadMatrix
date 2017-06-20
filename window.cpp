@@ -5,6 +5,8 @@
 void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers, 
 	int nParsers,int M, int N, std::vector<std::vector<char>>matrix)
 {
+	int c = 0;											//time iterator
+    int lines = M, cols = N;							//number of rows, number of columns
 
 	initscr();											//screen 'constructor'
 	cbreak();											//raw();
@@ -16,19 +18,23 @@ void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers,
 	init_pair(3,COLOR_GREEN, COLOR_BLACK);
 	init_pair(4,COLOR_WHITE, COLOR_BLACK);
 
-	queueStatus(first, second);							//paint info ui
-	threadStatus(nProducers, nParsers);
+	while(c < 5)
+	{
+		queueStatus(first, second);							//paint info ui
+		threadStatus(nProducers, nParsers);
+		WINDOW * win = newwin(100,100,6,3);					//board section window
+   		refresh();
 
-    int lines = M, cols = N;							//number of rows, number of columns
-	WINDOW * win = newwin(100,100,6,3);					//board section window
-   	refresh();
+   		board(win,lines,cols,matrix);						//board painting
+		wrefresh(win);
 
-   	board(win,lines,cols,matrix);						//board painting
-	
-	wrefresh(win);
+		c++;
+		usleep(1000000);
+	}
+
 	getch();											//getchar
 	endwin();											//screen 'destructor' 
-}
+}		
 
 void queueStatus(std::vector<int> first, std::vector<int> second)
 {

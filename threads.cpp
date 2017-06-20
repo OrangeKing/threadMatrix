@@ -5,8 +5,8 @@
 
 #include "window.h"
 
-static int RR = 5;						//rows 		(Ms)
-static int CC = 5;						//columns 	(Ns)
+static int RR = 6;						//rows 		(Ms)
+static int CC = 6;						//columns 	(Ns)
 
 std::vector<std::vector<char>> matrix(RR, std::vector<char>(CC));	//matrix RRxCC (MxN -> 5x5)
 
@@ -73,22 +73,21 @@ int main()
 	//Background threads running 
 	std::vector<std::thread> producerThreads;
 	std::vector<std::thread> parserThreads;
-	
-	//auto screenThread = std::thread(screen);
 
 	for (int i = 0; i < 3; i++)
-		producerThreads.push_back(std::thread(producerThread,5,5));	//liczby z zakresu m, n 
+		producerThreads.push_back(std::thread(producerThread,RR,CC));	
 	for (int i = 0; i < 1; i++)
 		parserThreads.push_back(std::thread(parserThread));
-
+	
+	auto screenThread = std::thread(drawScreen,queueFirst,queueSecond,producerThreads.size(),parserThreads.size(),RR,CC,matrix);
+	
 	for (auto& thread : producerThreads)
 		thread.join();
 	for (auto& thread : parserThreads)
 		thread.join();
 
-	//screenThread.join();
+	screenThread.join();
 
 	std::cout << "Main Done" << std::endl;
-	drawScreen(queueFirst,queueSecond,producerThreads.size(),parserThreads.size(),RR,CC,matrix);
 	return 0;
 }
