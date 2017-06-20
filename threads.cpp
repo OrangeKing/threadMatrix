@@ -5,9 +5,10 @@
 
 #include "window.h"
 
-static int RR = 5;
-static int CC = 5;
-std::vector<std::vector<char>> matrix(RR, std::vector<char>(CC));	//macierz RRxCC (MxN -> 5x5)
+static int RR = 5;						//rows 		(Ms)
+static int CC = 5;						//columns 	(Ns)
+
+std::vector<std::vector<char>> matrix(RR, std::vector<char>(CC));	//matrix RRxCC (MxN -> 5x5)
 
 std::vector<int> queueFirst;
 std::vector<int> queueSecond;	
@@ -34,24 +35,27 @@ void parserThread()
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<int> direction(0,3);	//losowy kierunek przesuniecia (0=N;1=S;2=W;3=E)
+	std::uniform_int_distribution<int> direction(0,3);	//random shuffle (0=N;1=S;2=W;3=E)
 
-	//shuffle board
-	// for (int i = 0; i < RR; i++)
-	// {
-	// 	for (int j = 0; j < CC; j++)
-	// 	{
-	// 		if(matrix[i][j]=='x')
-	// 		{
-	// 			std::cout << "ALARM-" << i+1 << j+1 << std::endl;
-				
-	// 			matrix[i][j] = 0;
-				
-	// 			if (j-1>0)
-	// 				matrix[i][j-1] = 'x';
-	// 		}
-	// 	}
-	// }
+	int pick = direction(mt);
+
+	switch(pick)
+	{
+		case 0 : 
+			shiftUp(matrix);
+			break;
+		case 1 : 
+			shiftLeft(matrix);
+			break;
+		case 2 : 
+			shiftDown(matrix);
+			break;
+		case 3 : 
+			shiftRight(matrix);
+			break;
+		default:
+			break;
+	}
 
 	//retrive pawn
 	mx.lock();
