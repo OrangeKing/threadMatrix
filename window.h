@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <mutex>
 
 void queueStatus(std::vector<int> first, std::vector<int> second);
 void threadStatus(int nProducers, int nParsers);

@@ -20,19 +20,21 @@ void drawScreen(std::vector<int> first, std::vector<int> second, int nProducers,
 
 	while(c < 5)
 	{
+		clear();
 		queueStatus(first, second);							//paint info ui
 		threadStatus(nProducers, nParsers);
 		WINDOW * win = newwin(100,100,6,3);					//board section window
-   		refresh();
 
    		board(win,lines,cols,matrix);						//board painting
+   		mvprintw(0,50,"%d",c);
+   		refresh();
 		wrefresh(win);
 
 		c++;
 		usleep(1000000);
 	}
 
-	getch();											//getchar
+	//getch();											//getchar
 	endwin();											//screen 'destructor' 
 }		
 
